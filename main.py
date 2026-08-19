@@ -3,11 +3,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.preprocessing import StandardScaler
 from sklearn.dummy import DummyClassifier
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import classification_report, confusion_matrix, precision_score, recall_score, f1_score
+from sklearn.metrics import classification_report, confusion_matrix, precision_score, recall_score, f1_score, accuracy_score, roc_auc_score
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import roc_curve, auc
 
 # ==========================================
 # 1. TẢI VÀ GỘP DỮ LIỆU (DATA LOADING)
@@ -94,25 +97,278 @@ y_pred_log = log_reg.predict(X_test_scaled)
 # ==========================================
 # 5. PHÂN TÍCH KẾT QUẢ (METRIC ANALYSIS)
 # ==========================================
-def evaluate_model(model_name, y_true, y_pred):
-    print(f"\n[{model_name}] KẾT QUẢ ĐÁNH GIÁ:")
-    
-    prec = precision_score(y_true, y_pred, zero_division=0)
-    rec = recall_score(y_true, y_pred, zero_division=0)
-    f1 = f1_score(y_true, y_pred, zero_division=0)
-    cm = confusion_matrix(y_true, y_pred)
-    tn, fp, fn, tp = cm.ravel()
-    
-    print(f"Precision: {prec:.4f}")
-    print(f"Recall:    {rec:.4f}")
-    print(f"F1-Score:  {f1:.4f}")
-    print(f"False Positives (FP): {fp} (Cảnh báo giả)")
-    print(f"False Negatives (FN): {fn} (Bỏ lọt tấn công)")
-    
-    print("Confusion Matrix:")
-    print(pd.DataFrame(cm, 
-                       index=['Actual NORMAL (0)', 'Actual ABNORMAL (1)'], 
-                       columns=['Predicted NORMAL (0)', 'Predicted ABNORMAL (1)']))
+def evaluate_model(
+    model,
+    model_name,
+    X_train,
+    X_test,
+    y_train,
+    y_test
+):
 
-evaluate_model("Baseline (Dummy)", y_test, y_pred_dummy)
-evaluate_model("Logistic Regression", y_test, y_pred_log)
+    train_pred = model.predict(X_train)
+    test_pred = model.predict(X_test)
+
+    train_f1 = f1_score(y_train, train_pred)
+    test_f1 = f1_score(y_test, test_pred)
+
+    acc = accuracy_score(y_test, test_pred)
+    prec = precision_score(y_test, test_pred, zero_division=0)
+    rec = recall_score(y_test, test_pred, zero_division=0)
+    f1 = f1_score(y_test, test_pred, zero_division=0)
+    cm = confusion_matrix(y_test, test_pred)
+
+    tn, fp, fn, tp = cm.ravel()
+
+    try:
+        probs = model.predict_proba(X_test)[:, 1]
+        roc_auc = roc_auc_score(y_test, probs)
+    except:
+        roc_auc = None
+
+    print(f"\n{'='*60}")
+    print(model_name)
+    print(f"{'='*60}")
+
+    print(f"Train F1 : {train_f1:.4f}")
+    print(f"Test F1  : {test_f1:.4f}")
+
+    if train_f1 - test_f1 > 0.05:
+        print("⚠️ Possible Overfitting Detected")
+    else:
+        print("✅ No Significant Overfitting")
+
+    print(f"\nAccuracy  : {acc:.4f}")
+    print(f"Precision : {prec:.4f}")
+    print(f"Recall    : {rec:.4f}")
+    print(f"F1 Score  : {f1:.4f}")
+
+    if roc_auc is not None:
+        print(f"ROC AUC   : {roc_auc:.4f}")
+
+    print(f"\nFalse Positives : {fp}")
+    print(f"False Negatives : {fn}")
+
+    print("\nConfusion Matrix")
+
+    print(
+        pd.DataFrame(
+            cm,
+            index=[
+                'Actual NORMAL',
+                'Actual ABNORMAL'
+            ],
+            columns=[
+                'Pred NORMAL',
+                'Pred ABNORMAL'
+            ]
+        )
+    )
+
+evaluate_model(
+    dummy_clf,
+    "Dummy Classifier",
+    X_train_scaled,
+    X_test_scaled,
+    y_train,
+    y_test
+)
+evaluate_model(
+    log_reg,
+    "Logistic Regression",
+    X_train_scaled,
+    X_test_scaled,
+    y_train,
+    y_test
+)
+
+
+
+
+# ==========================================
+# 6. HUẤN LUYỆN DECISION TREE
+# ==========================================
+print("--- Đang huấn luyện Decision Tree Model ---")
+# Sử dụng class_weight='balanced' để xử lý mất cân bằng dữ liệu tương tự Logistic Regression
+dt_clf = DecisionTreeClassifier(
+    max_depth=10,
+    min_samples_leaf=20,
+    class_weight='balanced',
+    random_state=42
+)
+dt_clf.fit(X_train_scaled, y_train)
+y_pred_dt = dt_clf.predict(X_test_scaled)
+
+# ==========================================
+# 7. HUẤN LUYỆN RANDOM FOREST
+# ==========================================
+print("--- Đang huấn luyện Random Forest Model (Có thể mất thời gian...) ---")
+# n_estimators=100 là số lượng cây trong rừng
+rf_clf = RandomForestClassifier(
+    n_estimators=200,
+    max_depth=15,
+    min_samples_leaf=10,
+    class_weight='balanced',
+    random_state=42,
+    n_jobs=-1
+)
+rf_clf.fit(X_train_scaled, y_train)
+y_pred_rf = rf_clf.predict(X_test_scaled)
+
+# ==========================================
+# 8. PHÂN TÍCH KẾT QUẢ SO SÁNH
+# ==========================================
+evaluate_model(
+    dt_clf,
+    "Decision Tree",
+    X_train_scaled,
+    X_test_scaled,
+    y_train,
+    y_test
+)
+evaluate_model(
+    rf_clf,
+    "Random Forest",
+    X_train_scaled,
+    X_test_scaled,
+    y_train,
+    y_test
+)
+
+
+# Cross Validation
+
+cv_scores = cross_val_score(
+    log_reg,
+    X_train_scaled,
+    y_train,
+    cv=5,
+    scoring='f1'
+)
+
+print("\nLogistic Regression CV F1")
+print(cv_scores)
+print("Mean:", cv_scores.mean())
+
+
+cv_scores = cross_val_score(
+    dt_clf,
+    X_train_scaled,
+    y_train,
+    cv=5,
+    scoring='f1'
+)
+
+print("\nDecision Tree CV F1")
+print(cv_scores)
+print("Mean:", cv_scores.mean())
+
+
+
+cv_scores = cross_val_score(
+    rf_clf,
+    X_train_scaled,
+    y_train,
+    cv=5,
+    scoring='f1'
+)
+
+print("\nRandom Forest CV F1")
+print(cv_scores)
+print("Mean:", cv_scores.mean())
+
+
+
+#For ROC:
+# Logistic Regression
+log_probs = log_reg.predict_proba(X_test_scaled)[:, 1]
+
+# Decision Tree
+dt_probs = dt_clf.predict_proba(X_test_scaled)[:, 1]
+
+# Random Forest
+rf_probs = rf_clf.predict_proba(X_test_scaled)[:, 1]
+
+# Logistic
+fpr_log, tpr_log, _ = roc_curve(y_test, log_probs)
+auc_log = auc(fpr_log, tpr_log)
+
+# Decision Tree
+fpr_dt, tpr_dt, _ = roc_curve(y_test, dt_probs)
+auc_dt = auc(fpr_dt, tpr_dt)
+
+# Random Forest
+fpr_rf, tpr_rf, _ = roc_curve(y_test, rf_probs)
+auc_rf = auc(fpr_rf, tpr_rf)
+
+
+#Feature Importance:
+
+importances = pd.DataFrame({
+    'Feature': features,
+    'Importance': rf_clf.feature_importances_
+})
+
+importances = importances.sort_values(
+    by='Importance',
+    ascending=False
+)
+
+print(importances)
+
+
+#Graph:
+plt.figure(figsize=(10,6))
+
+sns.barplot(
+    data=importances,
+    x='Importance',
+    y='Feature'
+)
+
+plt.title(
+    "Random Forest Feature Importance"
+)
+
+plt.show()
+
+
+plt.figure(figsize=(10, 7))
+
+plt.plot(
+    fpr_log,
+    tpr_log,
+    label=f'Logistic Regression (AUC = {auc_log:.4f})',
+    linewidth=2
+)
+
+plt.plot(
+    fpr_dt,
+    tpr_dt,
+    label=f'Decision Tree (AUC = {auc_dt:.4f})',
+    linewidth=2
+)
+
+plt.plot(
+    fpr_rf,
+    tpr_rf,
+    label=f'Random Forest (AUC = {auc_rf:.4f})',
+    linewidth=2
+)
+
+# Đường đoán ngẫu nhiên
+plt.plot(
+    [0, 1],
+    [0, 1],
+    linestyle='--',
+    color='gray',
+    label='Random Guess (AUC = 0.5)'
+)
+
+plt.xlabel("False Positive Rate")
+plt.ylabel("True Positive Rate")
+plt.title("ROC Curve Comparison")
+plt.legend(loc="lower right")
+plt.grid(True)
+
+plt.show()
