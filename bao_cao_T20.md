@@ -86,10 +86,21 @@ Với bài toán này:
 
 Các metric chính:
 
-- $Accuracy = (TP + TN)/(TP + TN + FP + FN)$.
-- $Precision = TP/(TP + FP)$.
-- $Recall = TP/(TP + FN)$.
-- $F1 = 2 \times Precision \times Recall/(Precision + Recall)$.
+$$
+Accuracy = \frac{TP+TN}{TP+TN+FP+FN}
+$$
+
+$$
+Precision = \frac{TP}{TP+FP}
+$$
+
+$$
+Recall = \frac{TP}{TP+FN}
+$$
+
+$$
+F1 = \frac{2 \times Precision \times Recall}{Precision + Recall}
+$$
 
 Trong giám sát an ninh mạng, recall cao giúp giảm bỏ sót flow cần điều tra, còn precision cao giúp giảm tải cho người phân tích. Vì vậy không nên chọn mô hình chỉ dựa trên accuracy.
 
