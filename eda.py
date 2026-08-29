@@ -7,7 +7,7 @@ import seaborn as sns
 
 # 1. ĐỌC VÀ GỘP TOÀN BỘ 8 FILE CSV
 # ---------------------------------------------------------
-folder_path = "D:\Data\MMTT20\computernetwork\dataset"  # Đường dẫn chứa 8 file CSV
+folder_path = "../computernetwork/dataset"  # Đường dẫn chứa 8 file CSV
 all_files = glob.glob(os.path.join(folder_path, "*.csv"))
 
 df_list = []
