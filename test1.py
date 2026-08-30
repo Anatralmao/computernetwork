@@ -56,6 +56,7 @@ df.drop_duplicates(inplace=True)
 print(f"Số lượng bản ghi sau khi xóa trùng: {len(df):,}")
 
 # Tạo nhãn nhị phân: NORMAL (0) và ABNORMAL (1)
+df["Label"] = df["Label"].astype(str).str.strip()
 df["Target"] = df["Label"].apply(lambda x: 0 if x == "BENIGN" else 1)
 
 # SỬA LỖI 2: Categorical Binning cho 'Destination Port' theo chuẩn IANA
