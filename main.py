@@ -51,7 +51,6 @@ print(f"Tỷ lệ ABNORMAL: {class_counts[1] / len(df) * 100:.2f}%\n")
 # Lựa chọn các Feature hợp lệ có sẵn trong Dataset theo yêu cầu đề T20:
 # (duration, packet_count, byte_count, rate, port, statistical features, flags)
 features = [
-    'Destination Port',             # Port
     'Flow Duration',                # Duration
     'Total Fwd Packets',            # Packet count (Forward)
     'Total Backward Packets',       # Packet count (Backward)
