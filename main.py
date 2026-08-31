@@ -71,13 +71,8 @@ port_dummies = pd.get_dummies(
     df["Port_Bin"], prefix="Port", drop_first=True, dtype=int
 )
 
-# B. One-Hot Encoding cho Protocol (THÊM VÀO ĐÂY)
-protocol_dummies = pd.get_dummies(
-    df["Protocol"], prefix="Proto", drop_first=True, dtype=int
-)
-
 # Ghép tất cả cột mới vào DataFrame
-df = pd.concat([df, port_dummies, protocol_dummies], axis=1)
+df = pd.concat([df, port_dummies], axis=1)
 
 # Lựa chọn Feature danh sách mới
 continuous_features = [
