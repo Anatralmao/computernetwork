@@ -59,6 +59,24 @@ print(f"Số lượng bản ghi sau khi xóa trùng: {len(df):,}")
 df["Label"] = df["Label"].astype(str).str.strip()
 df["Target"] = df["Label"].apply(lambda x: 0 if x == "BENIGN" else 1)
 
+print("\n--- Phân phối lớp sau tiền xử lý ---")
+
+class_counts = df["Target"].value_counts().sort_index()
+
+normal_count = class_counts[0]
+abnormal_count = class_counts[1]
+total_count = len(df)
+
+print(f"Tổng số flow: {total_count:,}")
+print(
+    f"NORMAL (0): {normal_count:,} "
+    f"({normal_count / total_count * 100:.2f}%)"
+)
+print(
+    f"ABNORMAL (1): {abnormal_count:,} "
+    f"({abnormal_count / total_count * 100:.2f}%)"
+)
+
 # SỬA LỖI 2: Categorical Binning cho 'Destination Port' theo chuẩn IANA
 # Well-Known: 0-1023, Registered: 1024-49151, Dynamic/Private: 49152-65535
 df["Port_Bin"] = pd.cut(
