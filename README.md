@@ -42,6 +42,7 @@
 
 ## 5. Dataset: nguồn, vị trí file, cách tạo hoặc cách tải
 * **Nguồn dữ liệu:** Bộ dữ liệu **CICIDS2017** do Học viện An ninh mạng Canada (CIC) thuộc Đại học New Brunswick (UNB) xây dựng, thu thập từ 09:00 thứ Hai (03/07/2017) đến 17:00 thứ Sáu (07/07/2017).
+**Link Dataset:** https://www.unb.ca/cic/datasets/ids-2017.html
 * **Trích xuất:** Dữ liệu bắt gói tin thô (`.pcap`) được trích xuất thành các thuộc tính thống kê luồng qua công cụ **CICFlowMeter**.
 * **Vị trí tệp tin:** 8 tệp định dạng `.csv` được lưu cố định tại thư mục `dataset/`.
 * **Quy mô:**
@@ -101,7 +102,7 @@ python main.py
 | **Dummy Classifier** | 0,0000 | 0,0000 | 0,8311 | 0,0000 | 0,0000 | 0,5000 |
 | **Logistic Regression** | 0,5465 | 0,5454 | 0,8066 | 0,4523 | 0,6866 | 0,8654 |
 | **Decision Tree** | 0,9832 | 0,9829 | 0,9942 | 0,9852 | 0,9807 | 0,9988 |
-| **Random Forest** | **0,9867** | **0,9862** | **0,9953** | **0,9840** | **0,9884** | **0,9996** |
+| **Random Forest** | 0,9867 | 0,9862 | 0,9953 | 0,9840 | 0,9884 | 0,9996 |
 
 * **Bảng tổng hợp lỗi FP và FN:**
 
