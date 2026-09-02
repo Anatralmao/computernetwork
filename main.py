@@ -23,9 +23,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.tree import DecisionTreeClassifier
 
-# ==========================================
 # 1. TẢI VÀ GỘP DỮ LIỆU (DATA LOADING)
-# ==========================================
 file_paths = [
     "dataset/Thursday-WorkingHours-Morning-WebAttacks.pcap_ISCX.csv",
     "dataset/Thursday-WorkingHours-Afternoon-Infilteration.pcap_ISCX.csv",
@@ -41,9 +39,7 @@ print("Đang tải và gộp dữ liệu...")
 df_list = [pd.read_csv(file) for file in file_paths]
 df = pd.concat(df_list, ignore_index=True)
 
-# ==========================================
 # 2. TIỀN XỬ LÝ (PREPROCESSING) & EDA
-# ==========================================
 df.columns = df.columns.str.strip()
 
 # Xử lý Inf và NaN
@@ -96,9 +92,7 @@ features = continuous_features + binary_features
 X = df[features]
 y = df["Target"]
 
-# ==========================================
 # 3. CHIA TẬP DỮ LIỆU (TRAIN/TEST SPLIT)
-# ==========================================
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=42, stratify=y
 )
@@ -116,9 +110,7 @@ X_test_scaled[continuous_features] = scaler.transform(
     X_test[continuous_features]
 )
 
-# ==========================================
 # 4. HUẤN LUYỆN MÔ HÌNH (MODELING)
-# ==========================================
 # A. Baseline Model
 dummy_clf = DummyClassifier(strategy="most_frequent")
 dummy_clf.fit(X_train_scaled, y_train)
@@ -149,9 +141,7 @@ rf_clf = RandomForestClassifier(
 )
 rf_clf.fit(X_train_scaled, y_train)
 
-# ==========================================
 # 5. HÀM ĐÁNH GIÁ MÔ HÌNH
-# ==========================================
 def evaluate_model(model, model_name, X_tr, X_te, y_tr, y_te):
     train_pred = model.predict(X_tr)
     test_pred = model.predict(X_te)
@@ -200,9 +190,7 @@ evaluate_model(
     rf_clf, "Random Forest", X_train_scaled, X_test_scaled, y_train, y_test
 )
 
-# ==========================================
 # 6. SỬA LỖI CV: DÙNG PIPELINE ĐỂ CHỐNG DATA LEAKAGE
-# ==========================================
 print("\n--- Đang chạy Cross-Validation chuẩn không rò rỉ dữ liệu ---")
 
 # Tạo pipeline kết hợp Scaler + LogisticRegression cho CV
@@ -223,9 +211,7 @@ cv_scores_rf = cross_val_score(
 print(f"Random Forest CV F1 (Mean): {cv_scores_rf.mean():.4f}")
 
 
-# ==========================================
 # 8. TRỰC QUAN HÓA SỰ HIỆU QUẢ CỦA CÁC MÔ HÌNH
-# ==========================================
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
@@ -241,7 +227,7 @@ models_dict = {
     "Random Forest": rf_clf,
 }
 
-# --- HÌNH 1: LƯỚI CONFUSION MATRIX DẠNG HEATMAP ---
+# HÌNH 1: LƯỚI CONFUSION MATRIX DẠNG HEATMAP
 fig, axes = plt.subplots(2, 2, figsize=(12, 10))
 axes = axes.ravel()
 
@@ -271,7 +257,7 @@ plt.suptitle(
 plt.tight_layout()
 plt.show()
 
-# --- HÌNH 2: SO SÁNH CÁC CHỈ SỐ METRICS (BAR CHART) ---
+# HÌNH 2: SO SÁNH CÁC CHỈ SỐ METRICS (BAR CHART)
 metrics_data = []
 
 for name, model in models_dict.items():
@@ -324,7 +310,7 @@ for p in ax.patches:
 plt.tight_layout()
 plt.show()
 
-# --- HÌNH 3: ĐƯỜNG CONG ROC SO SÁNH CẢ 4 MÔ HÌNH ---
+# HÌNH 3: ĐƯỜNG CONG ROC SO SÁNH CẢ 4 MÔ HÌNH
 plt.figure(figsize=(9, 6))
 
 for name, model in models_dict.items():
@@ -356,7 +342,7 @@ plt.grid(True, linestyle="--", alpha=0.6)
 plt.tight_layout()
 plt.show()
 
-# --- HÌNH 4: FEATURE IMPORTANCE CỦA RANDOM FOREST ---
+# HÌNH 4: FEATURE IMPORTANCE CỦA RANDOM FOREST
 importances = pd.DataFrame(
     {"Feature": features, "Importance": rf_clf.feature_importances_}
 ).sort_values(by="Importance", ascending=False)
