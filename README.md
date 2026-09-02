@@ -3,7 +3,7 @@
 ## 1. Thành viên nhóm và mã sinh viên
 * **Trường:** Đại học Ngoại thương – Khoa Công nghệ và Khoa học dữ liệu
 * **Môn học:** Mạng máy tính
-* **Lớp tín chỉ:** COSH201(2526.1 – GD1)1
+* **Lớp tín chỉ:** COSH201(2627.1 – HK1)GD1.1
 * **Giảng viên hướng dẫn:** TS. Ngô Hải Anh
 
 **Danh sách sinh viên thực hiện:**
