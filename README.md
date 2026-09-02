@@ -69,7 +69,7 @@
 ---
 
 ## 7. Thứ tự chạy các script/notebook
-Chương trình được thiết kế theo cơ chế "One-click", thực thi tự động qua một câu lệnh duy nhất trên Terminal:
+Chương trình được thiết kế theo cơ chế thực thi tự động qua một câu lệnh duy nhất trên Terminal:
 ```bash
 python main.py
 ```
